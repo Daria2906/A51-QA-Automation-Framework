@@ -1,25 +1,60 @@
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
-import java.time.Duration;
+import pages.HomePage;
+import pages.LoginPage;
 
 public class LoginTests extends BaseTest {
     @Test
-    public void loginEmptyEmailPassword() {
+    public static void loginEmptyEmailPasswordTest() {
+        LoginPage loginPage = new LoginPage(getThreadLocal());
 
-//      Added ChromeOptions argument below to fix websocket error
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--remote-allow-origins=*");
+        loginPage.provideEmail("")
+                .providePassword("te$t$tudent")
+                .clickSubmitBtn();
 
-        WebDriver driver = new ChromeDriver(options);
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        Assert.assertTrue(loginPage.getRegistrationLink().isDisplayed());
+    }
 
-        String url = "https://qa.koel.app/";
-        driver.get(url);
-        Assert.assertEquals(driver.getCurrentUrl(), url);
-        driver.quit();
+    @Test
+    public static void loginWrongPasswordTest() {
+        LoginPage loginPage = new LoginPage(getThreadLocal());
+
+        loginPage.provideEmail("demo@class.com")
+                .providePassword("te$t123")
+                .clickSubmitBtn();
+
+        Assert.assertTrue(loginPage.getRegistrationLink().isDisplayed());
+    }
+
+    @Test
+    public static void loginEmptyPasswordTest() {
+        LoginPage loginPage = new LoginPage(getThreadLocal());
+
+        loginPage.provideEmail("demo@class.com")
+                .providePassword("")
+                .clickSubmitBtn();
+
+        Assert.assertTrue(loginPage.getRegistrationLink().isDisplayed());
+    }
+
+    @Test
+    public static void loginWrongEmailTest() {
+        LoginPage loginPage = new LoginPage(getThreadLocal());
+
+        loginPage.provideEmail("demo@class.com")
+                .providePassword("te$t$tudent")
+                .clickSubmitBtn();
+
+        Assert.assertTrue(loginPage.getRegistrationLink().isDisplayed());
+    }
+
+    @Test
+    public void loginSucceedTest() {
+        LoginPage loginPage = new LoginPage(getThreadLocal());
+        HomePage homePage = new HomePage(getThreadLocal());
+
+        loginPage.provideLoginSucceed();
+
+        Assert.assertTrue(homePage.getUserAvatar().isDisplayed());
     }
 }
